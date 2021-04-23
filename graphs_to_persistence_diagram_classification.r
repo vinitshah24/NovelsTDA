@@ -36,6 +36,9 @@ Accuracy.Matrix <- matrix(0, nrow(writers), nrow(writers))
 colnames(Accuracy.Matrix) <- writers$description
 rownames(Accuracy.Matrix) <- writers$description
 
+print(writers)
+print(Accuracy.Matrix)
+
 # Function to get the accuracy of binary classification between each pair of writers
 accuracy.function <- function(writer1, writer2, random_name) {
 
@@ -262,8 +265,8 @@ accuracy.function <- function(writer1, writer2, random_name) {
     results <- rbind(results, TestsKNN[[i]])
   }
 
-  cm <- confusionMatrix(results$prediction, results$writer)
-  print(results)
+  # typeof(results) => list
+  cm <- confusionMatrix(as.factor(results$prediction), as.factor(results$writer))
   random2 <- runif(1, 1, 2000)
   rand_name <- paste('Compare.results', random_name, random2, '.csv', sep = '')
   setwd(paste(my_wd, "\\temp", sep = ''))
@@ -281,6 +284,8 @@ for (i in 1:(nrow(writers) - 1)) {
     T = 250
     x <- NA
     for (times in 1:T) {
+      cat(writers$writers[i], file = "output.txt", sep = "\n", append = TRUE)
+      cat(writers$writers[j], file = "output.txt", sep = "\n", append = TRUE)
       x[times] <- accuracy.function(writers$writers[i],
                                     writers$writers[j],
                                     random_name)
@@ -290,6 +295,7 @@ for (i in 1:(nrow(writers) - 1)) {
     Accuracy.Matrix[j, i] <- x
   }
 }
+
 setwd(paste(my_wd, "\\temp", sep = ''))
 temp.files <- list.files(path = ".")
 temp.files <- temp.files[grepl(as.character(random_name), temp.files)]
